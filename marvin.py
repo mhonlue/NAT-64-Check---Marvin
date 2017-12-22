@@ -1,9 +1,14 @@
 #!flask/bin/python
 from flask import Flask, json, jsonify, make_response, request, abort
 from pprint import pprint
+import json, pingparsing, requests
 import subprocess, socket
 
 app = Flask(__name__)
+
+parser = pingparsing.PingParsing()
+
+puppeteer = 'http://localhost:3001';
 
 def runPing(cmdArray):
 	process = subprocess.Popen(cmdArray, stdout=subprocess.PIPE)
@@ -11,12 +16,18 @@ def runPing(cmdArray):
 	output = process.communicate()[0]
 	return output
 
+def is_empty(any_structure):
+	if any_structure:
+		return False
+	else:
+		return True
+
 @app.route('/')
 def root():
-  return('Welcome')
+	return('Welcome')
 
 @app.route('/info')
-def getInfo():
+def getInfo(): # This shouldn't be static anymore
 	response = {
 				  "type": "Chrome Marvin",
 				  "version": "1.0.0",
@@ -77,5 +88,27 @@ def ping6(hostname):
 	else:
 		return('Method not allowed!'), 400
 
+@app.route('/request/', methods = ["GET","POST"])
+@app.route('/request/<url>', methods = ["GET","POST"])
+def screenAndRequest():
+	if request.method == 'POST':
+		if not is_empty(request.data):
+			request.get_json(force=False);
+		# request.data ~= {"viewport":[1024,1024],"timeout":60}
+		# FIXME - Parse the data more securely and efficiently - type &| length verification
+		if 'timeout' not in request.json:
+			request.json['timeout'] = 60
+		if 'viewport' not in request.json:
+			request.json['viewport'] = [1024,1024]
+		
+		pprint(request.json)
+		
+		payload = {'url': 'https://google.com', 'viewport': request.json['viewport'], 'timeout': request.json['timeout']}
+		pprint(payload)
+		output = requests.post(puppeteer + '/request', json = payload).content
+		return(output),200
+	else:
+		return('Method not allowed!'), 400
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=3000, debug=True)

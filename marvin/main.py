@@ -32,24 +32,24 @@ def getInfo(): # This shouldn't be static anymore
 				  "type": "Chrome Marvin",
 				  "version": "1.0.0",
 				  "browser": {
-				    "name": "Chromium",
-				    "version": "62.0.3170.2"
+					"name": "Chromium",
+					"version": "62.0.3170.2"
 				  },
 				  "instance_type": "nat64",
 				  "name": "sjms-42",
 				  "network": {
-				    "ipv4": {
-				      "address": "192.168.0.42/24",
-				      "gateway": "192.168.0.1"
-				    },
-				    "ipv6": {
-				      "address": "2001:db8::42/64",
-				      "gateway": "2001:db8::1"
-				    },
-				    "dns_server": "2001:db8::53"
+					"ipv4": {
+					  "address": "192.168.0.42/24",
+					  "gateway": "192.168.0.1"
+					},
+					"ipv6": {
+					  "address": "2001:db8::42/64",
+					  "gateway": "2001:db8::1"
+					},
+					"dns_server": "2001:db8::53"
 				  },
 				  "limits": {
-				    "parallel_tasks": 15
+					"parallel_tasks": 15
 				  }
 				}
 	return jsonify(response), 200
@@ -64,10 +64,10 @@ def ping(hostname):
 		data = json.loads(dataBytes) #Convert from bytes format to JSON
 
 		cmd = '-c%s -n -s%s -M%s'% (data['count'] , data['size'] , data['pmtu'])
-		output = runPing(['ping', cmd , hostname])
+		parser.parse(runPing(['ping', cmd , hostname]))
 
 		pprint('ping %s %s' %(cmd, hostname))
-		return(output),200
+		return(json.dumps(parser.as_dict(), indent=4)),200
 	else:
 		return('Method not allowed!'), 400
 
@@ -81,10 +81,10 @@ def ping6(hostname):
 		data = json.loads(dataBytes) #Convert from bytes format to JSON
 
 		cmd = '-c%s -n -s%s -M%s'% (data['count'] , data['size'] , data['pmtu'])
-		output = runPing(['ping6', cmd , hostname])
+		parser.parse(runPing(['ping6', cmd , hostname]))
 
 		pprint('ping6 %s %s' %(cmd, hostname))
-		return(output),200
+		return(json.dumps(parser.as_dict(), indent=4)),200
 	else:
 		return('Method not allowed!'), 400
 
@@ -111,4 +111,4 @@ def screenAndRequest():
 		return('Method not allowed!'), 400
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000, debug=True)
+	app.run(host='0.0.0.0', port=3000, debug=True)

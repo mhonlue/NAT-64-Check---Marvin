@@ -8,7 +8,7 @@ def ping_latencies(ping_output: bytes) -> List:
 
     ping_latencies = {nr: -1 for nr in range(1, 6)}
 #    for line in ping_output.encode().decode('utf-8').split('\n'):
-    for line in ping_output.encode().decode('utf-8').split('\n'):
+    for line in ping_output.split('\n'):
         nr_match = re.search("icmp_seq=(\d+) ", line)
         if nr_match:
             nr = int(nr_match.group(1))
@@ -34,7 +34,7 @@ def ping_ttls(ping_output: bytes) -> List:
 
     ping_ttls = {nr: -1 for nr in range(1, 6)}
 #    for line in ping_output.encode().decode('utf-8').split('\n'):
-    for line in ping_output.encode().decode('utf-8').split('\n'):
+    for line in ping_output.split('\n'):
         nr_match = re.search("icmp_seq=(\d+) ", line)
         if nr_match:
             nr = int(nr_match.group(1))
@@ -76,14 +76,15 @@ def parse_ping(ping_output: bytes):
 		   results['ttl'] = 'Null'
 		   results['latency'] = 'Null'
 		   json_results.append(results)
-	   
+	   elif latencies[i] == -1 :
+		   continue
 	   elif latencies[i] != -2 :
 		   results['status'] = 'ok'
 		   results['ttl'] = ttls[i]
 		   results['latency'] = latencies[i]
 		   json_results.append(results)
 		   
-   json_data['reults'] = json_results
+   json_data['results'] = json_results
    json_data['address'] = 'wert'
    json_data['success'] = True
    json_data['reason'] = "All ok"

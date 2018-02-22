@@ -5,7 +5,7 @@ import subprocess, socket
 def runPing(cmdArray):
         process = subprocess.Popen(cmdArray, stdout=subprocess.PIPE)
         # Run the command
-        output = process.communicate()[0]
+        output = process.communicate()[0].decode("utf-8") 
         return output
 
 def is_empty(any_structure):

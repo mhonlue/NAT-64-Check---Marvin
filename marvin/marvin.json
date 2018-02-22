@@ -1,0 +1,40 @@
+{
+    "DEFAULT": {
+	"SECRET_KEY": "secret-key-of-myapp",
+	"ADMIN_NAME": "administrator",
+	"AWS_DEFAULT_REGION": "ap-northeast-2",
+	"MAX_IMAGE_SIZE": 5242880
+    },
+    "INFO": {
+	"type": "Chrome Marvin",
+	"version": "1.0.0",
+	"browser": {
+	    "name": "Chromium",
+	    "version": "62.0.3170.2"
+	},
+	"instance_type": "nat64",
+	"name": "sjms-42",
+	"network": {
+	    "ipv4": {
+		"address": "192.168.0.42/24",
+		"gateway": "192.168.0.1"
+	    },
+	    "ipv6": {
+		"address": "2001:db8::42/64",
+		"gateway": "2001:db8::1"
+	    },  
+	    "dns_server": "2001:db8::53"
+	},
+      "limits": {
+	    "parallel_tasks": "2/day"
+      }
+    },
+    "TEST": {
+	"TEST_TMP_DIR": "tests",
+	"TEST_TIMEOUT": 20
+    },
+    "CI": {
+	"SERVICE": "travis-ci",
+	"HOOK_URL": "web-hooking-url-from-ci-service"
+    }
+}

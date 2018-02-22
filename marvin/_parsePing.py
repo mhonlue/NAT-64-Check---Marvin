@@ -65,9 +65,13 @@ def parse_ping(ping_output: bytes):
 
    json_data = {}
    json_results = []
+   addr = "wert"
+   success = 0
+   count = 0
+   
    
    for i in range(tablen):
-	   
+	   count = count + 1
 	   results = {}
 	 #  print(latencies[i] )
 	   
@@ -75,21 +79,29 @@ def parse_ping(ping_output: bytes):
 		   results['status'] = 'filtered'
 		   results['ttl'] = 'Null'
 		   results['latency'] = 'Null'
+		   success = success - 1
 		   json_results.append(results)
 	   elif latencies[i] == -1 :
-		   continue
+		   count = count - 1
 	   elif latencies[i] != -2 :
 		   results['status'] = 'ok'
 		   results['ttl'] = ttls[i]
 		   results['latency'] = latencies[i]
+		   success = success + 1
 		   json_results.append(results)
-		   
+    
    json_data['results'] = json_results
-   json_data['address'] = 'wert'
-   json_data['success'] = True
-   json_data['reason'] = "All ok"
-   
-   
+   json_data['address'] = addr
+   if success + count == 0 :
+	   json_data['success'] = False
+	   json_data['reason'] = "All Bad"
+   elif success == count :
+	   json_data['success'] = True
+	   json_data['reason'] = "All ok"
+   else:
+	   json_data['success'] = True
+	   json_data['reason'] = "Some packets loss"
+
    return(json_data)
 
 def punyHostname(hostname):
@@ -118,7 +130,6 @@ def main():
 64 bytes from 8.8.8.8: icmp_seq=6 ttl=59 time=22.0 ms
 From 172.17.5.253 icmp_seq=7 Packet filtered
 From 172.17.5.253 icmp_seq=8 Packet filtered
-
 --- 8.8.8.8 ping statistics ---
 3 packets transmitted, 3 received, 0% packet loss, time 2001ms
 rtt min/avg/max/mdev = 15.130/20.767/25.124/4.182 ms"""

@@ -27,7 +27,13 @@
 	},
       "limits": {
 	    "parallel_tasks": "2/day"
-      }
+	  },
+	  "ping": {
+		  "size": 56,
+		  "count": 5,
+		  "pmtu": "want",
+		  "timeout": 60
+	  }
     },
     "TEST": {
 	"TEST_TMP_DIR": "tests",

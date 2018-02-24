@@ -1,4 +1,5 @@
 from flask import request
+from marvin_config import *
 import json
 import subprocess, socket
 
@@ -26,4 +27,11 @@ def ping_options():
 	request.get_json(force=True);
 	dataBytes = request.data.decode('utf-8')
 	data = json.loads(dataBytes) #Convert from bytes format to JSON
+	if 'count' not in data:
+	        data['count'] = pingValues("count")
+	if 'size' not in data:
+	        data['size'] = pingValues("size")
+	if 'pmtu' not in data:
+	        data['pmtu'] = pingValues("pmtu")
+
 	return data

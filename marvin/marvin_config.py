@@ -15,3 +15,6 @@ def infoValues():
 
 def limitValue():
 	return(config["INFO"]["limits"]["parallel_tasks"])
+
+def pingValues(key):
+	return(config["INFO"]["ping"][key])

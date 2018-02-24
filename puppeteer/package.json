@@ -1,4 +1,11 @@
 {
+  "name": "puppeteer",
+  "version": "0.0.2",
+  "description": "Puppeter interface for Marvin",
+  "scripts": {
+    "debug": "env DEBUG='puppeteer:*' node main.js",
+    "start": "node main.js"
+     },
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.2",

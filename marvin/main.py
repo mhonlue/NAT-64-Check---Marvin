@@ -1,13 +1,14 @@
 #!flask/bin/python
 from flask import Flask, json, jsonify, make_response, request, abort
-from pprint import pprint
-import json
-import subprocess, socket
-from _utils import ping_options, runPing, punyHostname
-from _parsePing import marvinPingParser
-from marvin_config import *
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+
+from pprint import pprint
+import json, requests
+
+from _utils import *
+from _parsePing import marvinPingParser
+from marvin_config import *
 
 app = Flask(__name__)
 limiter = Limiter(
@@ -17,7 +18,7 @@ limiter = Limiter(
 )
 
 
-puppeteer = 'http://localhost:3001';
+puppeteer = 'http://' + puppeteerValues("host") + ':' + str(puppeteerValues("port"))
 
 @app.route('/')
 def root():
@@ -35,7 +36,6 @@ def ping(hostname):
 	if request.method == 'POST':
 		data = ping_options()
 
-		
 		cmd = '-c%s -n -s%s -M%s'% (data['count'] , data['size'] , data['pmtu'])
 		
 		output = runPing(['ping', cmd , punyHostname(hostname)])
@@ -70,11 +70,11 @@ def ping6(hostname):
 		return('Method not allowed!'), 400
 
 @app.route('/request/', methods = ["GET","POST"])
-@app.route('/request/<url>', methods = ["GET","POST"])
-def screenAndRequest():
+@app.route('/request/<hostname>', methods = ["GET","POST"])
+def screenAndRequest(hostname):
 	if request.method == 'POST':
 		if not is_empty(request.data):
-			request.get_json(force=False);
+			request.get_json(force=False)
 		# request.data ~= {"viewport":[1024,1024],"timeout":60}
 		# FIXME - Parse the data more securely and efficiently - type &| length verification
 		if 'timeout' not in request.json:
@@ -84,7 +84,7 @@ def screenAndRequest():
 		
 		pprint(request.json)
 		
-		payload = {'url': 'https://google.com', 'viewport': request.json['viewport'], 'timeout': request.json['timeout']}
+		payload = {"url": 'http://'+hostname, "viewport": request.json['viewport'], "timeout": request.json['timeout']}
 		pprint(payload)
 		output = requests.post(puppeteer + '/request', json = payload).content
 		return(output),200

@@ -1,13 +1,15 @@
 const Puppeteer = require('puppeteer');
 const express = require('express');
+const config = require('./config');
 
 const app = express();
-const port = 3001;
+const port = config.Puppeteer.port;
+const listen_address = config.Puppeteer.host;
 
-app.use(express.json());
+app.use(express.json()); // for parsing application/json
 
 const puppeteer = Puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--incognito']
+    args: config.Puppeteer.args
 })
 
 process.on('exit', function(){
@@ -19,6 +21,8 @@ async function getData(url, viewport, pageTimeout){
 	const page = await browser.newPage();
 	const resources = [];
 	const consoleArray = [];
+
+	console.log('Page created for url:', url);
 	
 	// Event - Push any console messages to consoleArray
 	page.on('console', msg => {
@@ -30,30 +34,33 @@ async function getData(url, viewport, pageTimeout){
 
 	page.on('response', response => {
 		// response.headers.date = new Date('response.headers.date').toISOString(); // FIXME - convert all date/time to round-trip date/time variant
-		resourceObject = { // Create Object for current resource
-			"success": response.ok,
-			"request":
-			{
-				"method": response._request['method'],
-				"url": response._request['url'],
-				"headers": response._request['headers'], //FIXME - Remove the date key/value from the 'headers' object
-				"time": response['headers']['date'] //FIXME - The date/time of the request doesn't look available from the API, currently using the same as the response
-			},
-			"response":{
-				"status": response['status'],
-				"headers": response['headers'],
-				"time": response['headers']['date']
-			}
-		};
 		if (!response.url.startsWith("data:") && !response.url.startsWith("blank:")){ // Because apparently data/blank protocols are tagged as separate requests on Chrome
+			resourceObject = { // Create Object for current resource
+				"success": response.ok,
+				"request":
+				{
+					"method": response._request['method'],
+					"url": response._request['url'],
+					"headers": response._request['headers'], //FIXME - Remove the date key/value from the 'headers' object
+					"time": response['headers']['date'] //FIXME - The date/time of the request doesn't look available from the API, currently using the same as the response
+				},
+				"response":{
+					"status": response['status'],
+					"headers": response['headers'],
+					"time": response['headers']['date']
+				}
+			};
 			resources.push(resourceObject);
 		}
 	});
+
 	await page.setViewport({width: viewport.width, height: viewport.height});
 	await page.goto(url);
 	const screenshot = Buffer.from(await page.screenshot({type: 'png', omitBackground: false })).toString('base64'); // FUTURE - Add the ability of selecting another mimetype from the POST data
-
+	
+	console.log('Page closed for url:', url);
 	page.close()
+	
 	return {
 		'request': {
 			'url': url,
@@ -68,12 +75,9 @@ async function getData(url, viewport, pageTimeout){
 
 app.post('/request', function (req, res) {
 	try{ // FIXME - Currently breaks when the required data (url,timeout,viewport) is not passed through POST
-		let parsedViewport = JSON.parse(req.body.viewport);
-
 		let url = req.body.url;
 		let pageTimeout = req.body.timeout;
-		let viewport = { width: parsedViewport[0], height: parsedViewport[1] };
-		console.log(req.body);
+		let viewport = { width: req.body.viewport[0], height: req.body.viewport[1] };
 
 		getData(url, viewport, pageTimeout).then(function(data) {
 	        res.send(data);
@@ -85,4 +89,4 @@ app.post('/request', function (req, res) {
 	
 })
 
-app.listen(port, () => console.log('Puppeteer listening on port',port,'!'));
+app.listen(port, listen_address, () => console.log('Puppeteer listening on ',listen_address,'port',port,'!'));

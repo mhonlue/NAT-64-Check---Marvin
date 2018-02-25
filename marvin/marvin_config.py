@@ -18,3 +18,6 @@ def limitValue():
 
 def pingValues(key):
 	return(config["INFO"]["ping"][key])
+
+def puppeteerValues(key):
+	return(config["Puppeteer"][key])

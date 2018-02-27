@@ -1,7 +1,6 @@
 from flask import request
 from marvin_config import *
-import json
-import subprocess, socket
+import json, subprocess, socket
 
 def runPing(cmdArray):
         process = subprocess.Popen(cmdArray, stdout=subprocess.PIPE)
@@ -24,7 +23,7 @@ def punyHostname(hostname):
         return hostname
 
 def ping_options():
-	request.get_json(force=True);
+	request.get_json(force=True)
 	dataBytes = request.data.decode('utf-8')
 	data = json.loads(dataBytes) #Convert from bytes format to JSON
 	if 'count' not in data:

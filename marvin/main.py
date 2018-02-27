@@ -86,10 +86,23 @@ def screenAndRequest(hostname):
 		
 		payload = {"url": 'http://'+hostname, "viewport": request.json['viewport'], "timeout": request.json['timeout']}
 		pprint(payload)
-		output = requests.post(puppeteer + '/request', json = payload).content
+		try:
+			output = requests.post(puppeteer + '/request', json = payload).content
+			return(output),200
+		except requests.exceptions.ConnectionError as e:
+			return jsonify({'error': 'Server Error, couldn\'t connect to Puppeteer instance'}), 500
+			pass
 		return(output),200
 	else:
-		return('Method not allowed!'), 400
+		return jsonify({'error': 'Method not allowed!'}), 400
+
+@app.errorhandler(404)
+def not_found(error):
+	return jsonify({'error': 'Not found'}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+	return jsonify({'error': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', port=3000, debug=True)

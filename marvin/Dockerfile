@@ -1,8 +1,7 @@
 FROM centos:7
 MAINTAINER SDE <honlue@gmail.com>
 EXPOSE 3000
-ADD https://raw.githubusercontent.com/mhonlue/NAT-64-Check-Marvin/dev/marvin/main.py /root/
-ADD https://raw.githubusercontent.com/mhonlue/NAT-64-Check-Marvin/dev/marvin/requirements.txt /root/
+ADD * /root/
 RUN yum install -y epel-release
 RUN yum install -y python34 python34-pip
 RUN cd /root/ && \

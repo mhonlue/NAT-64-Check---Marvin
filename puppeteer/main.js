@@ -77,7 +77,8 @@ app.post('/request', function (req, res) {
 	try{ // FIXME - Currently breaks when the required data (url,timeout,viewport) is not passed through POST
 		let url = req.body.url;
 		let pageTimeout = req.body.timeout;
-		let viewport = { width: req.body.viewport[0], height: req.body.viewport[1] };
+		let viewportArry = JSON.parse(req.body.viewport);
+		let viewport = { width: viewportArry[0], height: viewportArry[1] };
 
 		getData(url, viewport, pageTimeout).then(function(data) {
 	        res.send(data);

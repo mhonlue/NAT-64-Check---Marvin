@@ -3,7 +3,7 @@ MAINTAINER SDE <darrell.emilien@afrinic.net>
 EXPOSE 3001
 ADD * /root/
 RUN yum install -y epel-release
-RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
+RUN curl --silent --location https://rpm.nodesource.com/setup_9.x | bash -
 RUN yum install -y nodejs chromium
 RUN cd /root/ && \
 npm install

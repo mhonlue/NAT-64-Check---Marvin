@@ -26,7 +26,7 @@
 	    "dns_server": "2001:db8::53"
 	},
       "limits": {
-	    "parallel_tasks": "2/day"
+	    "parallel_tasks": "10/seconde"
 	  },
 	  "ping": {
 		  "size": 56,

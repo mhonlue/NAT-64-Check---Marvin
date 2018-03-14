@@ -57,7 +57,7 @@ def ping6(hostname):
 		data = ping_options()
 
 		cmd = '-c%s -n -s%s -M%s'% (data['count'] , data['size'] , data['pmtu'])
-		output = runPing(['ping', cmd , punyHostname(hostname)])
+		output = runPing(['ping6', cmd , punyHostname(hostname)])
 		
 		result = marvinPingParser(hostname, data, output)
 		

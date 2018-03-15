@@ -5,6 +5,7 @@ from flask_limiter.util import get_remote_address
 
 from pprint import pprint
 import json, requests
+import ast
 
 from _utils import *
 from _parsePing import marvinPingParser
@@ -79,18 +80,34 @@ def screenAndRequest(hostname):
 		# FIXME - Parse the data more securely and efficiently - type &| length verification
 		if 'timeout' not in request.json:
 			request.json['timeout'] = 60
+		else:
+			try:
+				request.json['timeout'] = int(request.json['timeout'])
+			except ValueError as e:
+				return jsonify({'error': 'Bad Request, timeout: Requires valid integer'}), 400
+
 		if 'viewport' not in request.json:
 			request.json['viewport'] = [1024,1024]
+		else:
+			try:
+				#request.json['viewport'] = ast.literal_eval(request.json['viewport'])
+				if (len(ast.literal_eval(request.json['viewport'])) != 2 ):
+					raise ValueError('viewport array length != 2')
+			except ValueError as e:
+				return jsonify({'error': 'Bad Request, viewport:  Must provide the following format [x,x]'}), 400
 		
 		pprint(request.json)
 		
 		payload = {"url": 'http://'+hostname, "viewport": request.json['viewport'], "timeout": request.json['timeout']}
 		pprint(payload)
 		try:
-			output = requests.post(puppeteer + '/request', json = payload).content
+			output = requests.post(puppeteer + '/request', json = payload, timeout=request.json['timeout']).content
 			return(output),200
 		except requests.exceptions.ConnectionError as e:
 			return jsonify({'error': 'Server Error, couldn\'t connect to Puppeteer instance'}), 500
+			pass
+		except requests.exceptions.ReadTimeout as e:
+			return jsonify({'error': 'Server timeout, couldn\'t get a response from Puppeteer instance in '+str(request.json['timeout'])+' seconds.'}), 500
 			pass
 		return(output),200
 	else:

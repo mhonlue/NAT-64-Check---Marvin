@@ -2,6 +2,7 @@
 from flask import Flask, json, jsonify, make_response, request, abort
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from urllib.parse import urlparse
 
 from pprint import pprint
 import json, requests
@@ -71,9 +72,12 @@ def ping6(hostname):
 		return('Method not allowed!'), 400
 
 @app.route('/request/', methods = ["GET","POST"])
-@app.route('/request/<hostname>', methods = ["GET","POST"])
-def screenAndRequest(hostname):
+@app.route('/request/<path:url>', methods = ["GET","POST"])
+def screenAndRequest(url):
 	if request.method == 'POST':
+
+		url = urlparse(url,'http').geturl()
+
 		if not is_empty(request.data):
 			request.get_json(force=False)
 		# request.data ~= {"viewport":[1024,1024],"timeout":60}
@@ -98,7 +102,7 @@ def screenAndRequest(hostname):
 		
 		pprint(request.json)
 		
-		payload = {"url": 'http://'+hostname, "viewport": request.json['viewport'], "timeout": request.json['timeout']}
+		payload = {"url": 'http://'+url, "viewport": request.json['viewport'], "timeout": request.json['timeout']}
 		pprint(payload)
 		try:
 			output = requests.post(puppeteer + '/request', json = payload, timeout=request.json['timeout']).content

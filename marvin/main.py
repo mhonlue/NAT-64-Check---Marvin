@@ -102,7 +102,7 @@ def screenAndRequest(url):
 		
 		pprint(request.json)
 		
-		payload = {"url": 'http://'+url, "viewport": request.json['viewport'], "timeout": request.json['timeout']}
+		payload = {"url": url, "viewport": request.json['viewport'], "timeout": request.json['timeout']}
 		pprint(payload)
 		try:
 			output = requests.post(puppeteer + '/request', json = payload, timeout=request.json['timeout']).content
